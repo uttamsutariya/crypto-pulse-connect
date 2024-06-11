@@ -2,7 +2,7 @@ import WebSocket, { Server } from 'ws';
 import config from '../utils/config';
 import { KafkaMessage } from '../types/kafkaMessage';
 
-interface Message {
+interface ClientMessage {
   action: 'subscribe' | 'unsubscribe';
   symbol: string;
 }
@@ -19,7 +19,7 @@ class WebSocketServer {
   start(): void {
     this.server.on('connection', (ws: WebSocket) => {
       ws.on('message', (message: string) => {
-        const { action, symbol }: Message = JSON.parse(message);
+        const { action, symbol }: ClientMessage = JSON.parse(message);
         if (action === 'subscribe') {
           this.subscribe(ws, symbol);
         }
