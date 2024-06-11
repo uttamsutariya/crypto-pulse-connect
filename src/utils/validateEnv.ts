@@ -7,7 +7,7 @@ const envSchema = z.object({
   KAFKA_CLIENT_ID: z.string(),
   KAFKA_BROKERS: z.string(),
   KAFKA_TOPIC: z.string(),
-  WEBSOCKET_PORT: z.string().transform((val) => parseInt(val, 10)),
+  PORT: z.string().transform((val) => parseInt(val, 10)),
 });
 
 const env = envSchema.safeParse(process.env);

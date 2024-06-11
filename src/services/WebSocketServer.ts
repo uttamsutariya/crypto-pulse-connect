@@ -1,5 +1,5 @@
 import WebSocket, { Server } from 'ws';
-import config from '../utils/config';
+import { Server as HttpServer } from 'http';
 import { KafkaMessage } from '../types/kafkaMessage';
 
 interface ClientMessage {
@@ -11,8 +11,8 @@ class WebSocketServer {
   private server: Server;
   private rooms: Record<string, Set<WebSocket>>;
 
-  constructor() {
-    this.server = new WebSocket.Server({ port: config.websocket.port });
+  constructor(httpServer: HttpServer) {
+    this.server = new WebSocket.Server({ server: httpServer });
     this.rooms = {};
   }
 
@@ -29,7 +29,7 @@ class WebSocketServer {
       });
 
       ws.on('close', () => {
-        this.removeClientFromRoom(ws);
+        this.removeClientFromAllRooms(ws);
       });
     });
   }
@@ -47,7 +47,7 @@ class WebSocketServer {
     }
   }
 
-  private removeClientFromRoom(ws: WebSocket): void {
+  private removeClientFromAllRooms(ws: WebSocket): void {
     for (const symbol in this.rooms) {
       if (this.rooms[symbol].has(ws)) {
         this.rooms[symbol].delete(ws);

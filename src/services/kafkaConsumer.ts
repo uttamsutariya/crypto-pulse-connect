@@ -7,8 +7,6 @@ class KafkaConsumer {
   private consumer: Consumer;
 
   constructor() {
-    console.log('Kafka broker addresses:', config.kafka.brokers);
-
     this.kafka = new Kafka({
       clientId: config.kafka.clientId,
       brokers: config.kafka.brokers,
@@ -42,7 +40,7 @@ class KafkaConsumer {
     messageHandler: (message: KafkaMessage) => void,
   ): Promise<void> {
     try {
-      await this.consumer.run({
+      this.consumer.run({
         eachMessage: async ({
           topic,
           partition,

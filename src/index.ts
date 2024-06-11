@@ -1,18 +1,37 @@
+import express from 'express';
+import { Server as HttpServer } from 'http';
+import { WebSocket } from 'ws';
 import KafkaConsumer from './services/kafkaConsumer';
 import WebSocketServer from './services/WebSocketServer';
 import { KafkaMessage } from './types/kafkaMessage';
+import config from './utils/config';
+import restService from './services/restServer';
 
-const start = async (): Promise<void> => {
-  const kafkaConsumer = new KafkaConsumer();
-  const websocketServer = new WebSocketServer();
+const app = express();
+app.use(express.json());
+app.use(express.raw());
+app.use(express.text());
+app.use(restService);
 
-  await kafkaConsumer.connect();
-  websocketServer.start();
+const main = async (): Promise<void> => {
+  try {
+    const server = new HttpServer(app);
+    const kafkaConsumer = new KafkaConsumer();
+    const websocketServer = new WebSocketServer(server);
 
-  kafkaConsumer.consume((message: KafkaMessage) => {
-    const { symbol } = message;
-    websocketServer.broadcast(symbol, message);
-  });
+    server.listen(config.http.port, async () => {
+      console.log(`Server running on port ${config.http.port}`);
+      await kafkaConsumer.connect();
+      websocketServer.start();
+
+      kafkaConsumer.consume((message: KafkaMessage) => {
+        const { symbol } = message;
+        websocketServer.broadcast(symbol, message);
+      });
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
-start().catch(console.error);
+main();

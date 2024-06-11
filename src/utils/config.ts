@@ -6,8 +6,8 @@ const config = {
     brokers: env.KAFKA_BROKERS.split(','),
     topic: env.KAFKA_TOPIC,
   },
-  websocket: {
-    port: env.WEBSOCKET_PORT,
+  http: {
+    port: env.PORT,
   },
 };
 
