@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model CryptoInstrument {
+  id         Int                  @id @default(autoincrement())
+  symbol     String
+  commonName String               @unique
+  base       String
+  quote      String
+  type       CryptoInstrumentType
+  symbolFrom SymbolFromType
+
+  @@map("crypto_instruments")
+}
+
+enum CryptoInstrumentType {
+  SPOT
+  PERPETUAL
+}
+
+enum SymbolFromType {
+  BINANCE_SPOT
+  BINANCE_USD_M_FUT
+  BINANCE_COIN_M_FUT
+}
